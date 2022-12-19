@@ -38,6 +38,10 @@ export async function replaceLocationStatus(table) {
 	});
 }
 
+/**
+ * delete all location table
+ * @returns 
+ */
 export async function deleteAllLocationTable() {
   try {
 	await LocationStatus.truncate();
@@ -48,29 +52,11 @@ export async function deleteAllLocationTable() {
   }
 }
 
-
-// export async function deleteLocationTable(targets) {
-// 	if (targets == null) {
-// 	  try {
-// 		await LocationStatus.destroy({ where: {} });
-// 		return true;
-// 	  } catch (e) {
-// 		console.error(e);
-// 		return false;
-// 	  }
-// 	} else if (targets.length == 0) {
-// 	  return true;
-// 	} else {
-// 	  try {
-// 		await LocationStatus.destroy({ where: { targetId: targets } });
-// 		return true;
-// 	  } catch (e) {
-// 		console.error(e);
-// 		return false;
-// 	  }
-// 	}
-// }
-
+/**
+ * delete targets in location table
+ * @param {Array<string>} targets 
+ * @returns 
+ */
 export async function deleteLocationTable(targets) {
 	if (targets == null) return false;
 	if (targets.length == 0) return true;
@@ -91,12 +77,23 @@ export async function deleteLocationTable(targets) {
 	}
   }
   
-
+/**
+ * check existed intraId in User table
+ * @param {String} intraId 
+ * @returns 
+ */
 export async function isExistIntraId(intraId) {
 	const user = await User.findByPk(intraId);
 	return user !== null;
   }
 
+/**
+ * check existed intraId and slackId in User table
+ * If intraId exists, update the slackId
+ * else create intraId and slackId in User table
+ * @param {String} intraId 
+ * @param {String} slackId 
+ */
 export async function registerNewClient(intraId, slackId) {
 	const user = await User.findByPk(intraId);
 	if (user) {
@@ -106,23 +103,23 @@ export async function registerNewClient(intraId, slackId) {
 	}
   }
 
+/**
+ * After checking whether there is a value of intraId based on the slackId,
+ * return intraId if there is, and return null if not.
+ * @param {String} slackId 
+ * @returns {String} intraId or null
+ */
 export async function getIntraIdbySlackId(slackId) {
 	const user = await User.findOne({ where: { slackId: slackId } });
 	return user ? user.intraId : null;
   }
 
 export async function getUsersLocationInfo(targetIds) {
-	let locationInfo = [];
-	for (const targetId of targetIds) {
-	  const locationStatus = await LocationStatus.findByPk(targetId);
-	  if (locationStatus) {
-		locationInfo.push({ targetId: locationStatus.targetId, host: locationStatus.host });
-	  } else {
-		locationInfo.push({ targetId: targetId, host: null });
-	  }
-	}
+	const locationStatuses = await LocationStatus.findAll({ where: { targetId: targetIds } });
+	const locationInfo = locationStatuses.map(locationStatus => ({ targetId: locationStatus.targetId, host: locationStatus.host }));
 	return locationInfo;
   }
+  
   
 export async function getGroupLocationInfo(seekerId, groupId) {
 	const groupMembers = await Group.findOne({
