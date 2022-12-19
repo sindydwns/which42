@@ -17,7 +17,8 @@ import Sequelize from "sequelize";
 import sequelize from "../setting.js";
 import LocationStatus from "../models/locationStatus.js";
 import User from "../models/user.js";
-import GroupMember from "../models/groupMember.js"
+import Group from "../models/group.js";
+import GroupMember from "../models/groupMember.js";
 
 
 /**
@@ -113,14 +114,25 @@ export async function getIntraIdbySlackId(slackId) {
 	const user = await User.findOne({ where: { slackId: slackId } });
 	return user ? user.intraId : null;
   }
-
+/**
+ * find all targetId in loacationStatus.
+ * @param {Array<string>} targetIds 
+ * @returns {Array<string>} finded all targetId's locations.
+ */
 export async function getUsersLocationInfo(targetIds) {
 	const locationStatuses = await LocationStatus.findAll({ where: { targetId: targetIds } });
 	const locationInfo = locationStatuses.map(locationStatus => ({ targetId: locationStatus.targetId, host: locationStatus.host }));
 	return locationInfo;
   }
   
-  
+
+/**
+ * Retrieves location information for members of a group.
+ *
+ * @param {string} seekerId - The ID of the seeker.
+ * @param {string} groupId - The ID of the group.
+ * @returns {Array.<Object>} An array of objects containing the target ID and host information for each group member.
+ */
 export async function getGroupLocationInfo(seekerId, groupId) {
 	const groupMembers = await Group.findOne({
 	  where: { seekerId, groupId },
@@ -144,10 +156,14 @@ export async function getGroupLocationInfo(seekerId, groupId) {
 	}));
   }
 
-  export async function getUserInfo(intraId) {
-	const user = await User.findOne({
-	  where: { intraId }
-	});
-	return user;
-  }
-  
+/**
+ * get User Info.
+ * @param {String} intraId 
+ * @returns {String} user.intraId
+ */
+export async function getUserInfo(intraId) {
+const user = await User.findOne({
+	where: { intraId }
+});
+return user;
+}
