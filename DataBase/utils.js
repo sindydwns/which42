@@ -193,64 +193,64 @@ export async function deleteMember(groupId, targetId) {
 
 
 
-// export async function getAlarmList(seekerId) {
-// 	const [alarmList, ...other] = await connection.query("select target_id from alarm where seeker_id=?", [seekerId]);
-// 	return alarmList;
+// // export async function getAlarmList(seekerId) {
+// // 	const [alarmList, ...other] = await connection.query("select target_id from alarm where seeker_id=?", [seekerId]);
+// // 	return alarmList;
+// // }
+// /**
+//  * @param {string} intraId 
+//  * @param {string|Array<string>} targetId 
+//  * @param {string} notifySlackId
+//  * @returns 
+//  */
+// export async function insertAlarm(intraId, targetId, notifySlackId) {
+// 	targetId = typeof(targetId) == "string" ? [targetId] : targetId;
+// 	const values = targetId.map(x => [intraId, x, notifySlackId]);
+// 	try {
+// 		await connection.query("insert into alarm(intraId, targetId, notify_slack_id) values ?;", [values]);
+// 		return (true);
+// 	}
+// 	catch (e) {
+// 		console.error(e);
+// 		return (false);
+// 	}
 // }
-/**
- * @param {string} intraId 
- * @param {string|Array<string>} targetId 
- * @param {string} notifySlackId
- * @returns 
- */
-export async function insertAlarm(intraId, targetId, notifySlackId) {
-	targetId = typeof(targetId) == "string" ? [targetId] : targetId;
-	const values = targetId.map(x => [intraId, x, notifySlackId]);
-	try {
-		await connection.query("insert into alarm(intraId, targetId, notify_slack_id) values ?;", [values]);
-		return (true);
-	}
-	catch (e) {
-		console.error(e);
-		return (false);
-	}
-}
-export async function deleteAlarm(seekerId, targetId) {
-	try {
-		await connection.query("delete from alarm where seeker_id=? and target_id=?;", [seekerId, targetId]);
-		return (true);
-	}
-	catch (e) {
-		console.error(e);
-		return (false);
-	}
-}
-export async function getAllReservedAlarm() {
-	const [alarms, ...other] = await connection.query("select a.alarm_id, a.seeker_id, a.target_id, ls.host, u.slack_id as notify_slack_id from alarm a inner join user_list u on a.seeker_id = u.intra_id left join location_status ls on a.target_id = ls.target_id where ls.host is not null;");
-	return alarms;
-}
-export async function insertStatisticHost(data) {
-	try {
-		await connection.query("insert into statistic_host(cluster, student_count) values ?", [data]);
-		return (true);
-	}
-	catch (e) {
-		console.error(e);
-		return (false);
-	}
-}
-export async function deleteReservedAlarm(ids) {
-    if (ids.length == 0)
-        return ;
-    await connection.query("delete from alarm where alarm_id in (?)", [ids]);
-}
-export async function insertErrorLog(message) {
-	try {
-		await connection.query("insert into error_log(message) values(?)", [message]);
-		return (true);
-	}
-	catch (e) {
-		console.error(e);
-		return (false);
-	}
-}
+// export async function deleteAlarm(seekerId, targetId) {
+// 	try {
+// 		await connection.query("delete from alarm where seeker_id=? and target_id=?;", [seekerId, targetId]);
+// 		return (true);
+// 	}
+// 	catch (e) {
+// 		console.error(e);
+// 		return (false);
+// 	}
+// }
+// export async function getAllReservedAlarm() {
+// 	const [alarms, ...other] = await connection.query("select a.alarm_id, a.seeker_id, a.target_id, ls.host, u.slack_id as notify_slack_id from alarm a inner join user_list u on a.seeker_id = u.intra_id left join location_status ls on a.target_id = ls.target_id where ls.host is not null;");
+// 	return alarms;
+// }
+// export async function insertStatisticHost(data) {
+// 	try {
+// 		await connection.query("insert into statistic_host(cluster, student_count) values ?", [data]);
+// 		return (true);
+// 	}
+// 	catch (e) {
+// 		console.error(e);
+// 		return (false);
+// 	}
+// }
+// export async function deleteReservedAlarm(ids) {
+//     if (ids.length == 0)
+//         return ;
+//     await connection.query("delete from alarm where alarm_id in (?)", [ids]);
+// }
+// export async function insertErrorLog(message) {
+// 	try {
+// 		await connection.query("insert into error_log(message) values(?)", [message]);
+// 		return (true);
+// 	}
+// 	catch (e) {
+// 		console.error(e);
+// 		return (false);
+// 	}
+// }
