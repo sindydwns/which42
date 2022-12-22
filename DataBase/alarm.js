@@ -75,3 +75,70 @@ export async function deleteReservedAlarm(ids) {
 		}
 	})
 }
+
+/**
+ * 
+ * @param {STRING} message 
+ * @returns {boolean}
+ */
+export async function insertErrorLog(message) {
+	try {
+		await ErrorLog.create({
+			message,
+		});
+		return (true);
+	}
+	catch (e) {
+		console.error(e);
+		return (false);
+	}
+}
+
+/**
+ * 
+ * @param {Array<Array<integer>>} data 
+ * @returns {boolean}
+ */
+export async function insertStatisticHost(data) {
+	const values = data.map(item => ({ cluster: item[0], studentCount: item[1] }));
+	try {
+		await StatisticsHost.bulkCreate(values, {
+			fields: ['cluster', 'studentCount'],
+			updateOnDuplicate: ['studentCount'],
+		});
+		return (true);
+	}	
+	catch (e) {
+		console.error(e);
+		return (false);
+	}
+}
+
+/**
+ * 
+ * @returns {object}
+ */
+export async function getAllReservedAlarm() {
+	try {
+		Alarm.belongsTo(User, { foreignKey: 'intraId' });
+		Alarm.belongsTo(LocationStatus, { foreignKey: 'targetId' });
+		const alarms = await Alarm.findAll({
+		  include: [{
+			model: User,
+			attributes: ['slackId'],
+			required: true,
+		  }, {
+			model: LocationStatus,
+			attributes: ['host'],
+			required: false,
+		  }],
+		  where: {
+			'$LocationStatus.host$': { [Sequelize.Op.ne]: null }
+		  }
+		});
+		return alarms;
+	} catch (e) {
+		console.error(e);
+		return (false);
+	}
+}
