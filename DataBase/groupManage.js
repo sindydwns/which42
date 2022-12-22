@@ -50,9 +50,9 @@ import { Group } from "../models/index.js";
 }
 	
 /**
- * @description 그룹(groupId)에 속하는 모든 멤버를 배열 형태로 반환하는 함수, 실패하면 null 반환
- * @param {number} gorupId 
- * @param {Array<string>}
+ * @description 그룹(groupId)에 속하는 모든 멤버를 배열 형태로 반환하는 함수.
+ * @param {number} groupId 그룹의 groupId.
+ * @returns {Array<string>} 해당 그룹의 멤버들의 리스트. 실패하면 null 반환.
  */
 export async function getMemberList(groupId) {
 	try {
@@ -79,7 +79,7 @@ export async function getMemberList(groupId) {
  * @param {number} selectedGroupId 
  *  사용자가 선택한 그룹의 groupId.
  *  사용자가 "워크스페이스에서 유저 선택"을 선택한 경우 null 값이 들어온다.
- * @returns 반환값 x
+ * @returns 반환값 x.
  */
 export async function updateSelectedGroup(intraId, selectedGroupId) {
 	try {
@@ -101,9 +101,9 @@ export async function updateSelectedGroup(intraId, selectedGroupId) {
 
 /**
  * @description 사용자가 새로운 그룹을 추가하면 데이터베이스에 그룹을 추가하는 함수.
- * @param {string} intraId 사용자의 intraId
- * @param {string|Array<string>} groupName 추가하고 싶은 그룹의 이름
- * @returns 성공하면 true, 실패하면 false 반환
+ * @param {string} intraId 사용자의 intraId.
+ * @param {string|Array<string>} groupName 추가하고 싶은 그룹의 이름.
+ * @returns 성공하면 true, 실패하면 false 반환.
  */
 export async function insertGroup(intraId, groupName) {
 	groupName = Array.isArray(groupName) ? groupName : [groupName];
@@ -123,7 +123,7 @@ export async function insertGroup(intraId, groupName) {
  *  사용자가 선택한 그룹을 데이터베이스에서 제거하는 함수.
  * @param {string} intraId 사용자의 intraId.
  * @param {number} groupId 사용자가 삭제하고자 하는 groupId.
- * @returns 성공하면 true, 실패하면 false
+ * @returns 성공하면 true, 실패하면 false.
  */
 export async function deleteGroup(intraId, groupId) {
 	try {
@@ -141,10 +141,10 @@ export async function deleteGroup(intraId, groupId) {
 }
 
 /**
- * @description 특정 그룹에 멤버를 추가하는 함수
- * @param {number} groupId 멤버를 추가하고자 하는 groupId
- * @param {string|Array<string>} targetId 추가하고자 하는 멤버의 intraId
- * @returns 성공하면 true, 실패하면 false
+ * @description 특정 그룹에 멤버를 추가하는 함수.
+ * @param {number} groupId 멤버를 추가하고자 하는 groupId.
+ * @param {string|Array<string>} targetId 추가하고자 하는 멤버의 intraId.
+ * @returns 성공하면 true, 실패하면 false.
  */
 export async function insertMember(groupId, targetId) {
 	targetId = Array.isArray(targetId) ? targetId : [targetId];
@@ -159,10 +159,10 @@ export async function insertMember(groupId, targetId) {
 }
 
 /**
- * @description 특정 그룹에서 멤버를 삭제하는 함수
- * @param {number} groupId 삭제하고자 하는 멤버가 있는 그룹의 groupId
- * @param {string} targetId 삭제하고자 하는 멤버의 intraId
- * @returns 성공하면 true, 실패하면 false
+ * @description 특정 그룹에서 멤버를 삭제하는 함수.
+ * @param {number} groupId 삭제하고자 하는 멤버가 있는 그룹의 groupId.
+ * @param {string} targetId 삭제하고자 하는 멤버의 intraId.
+ * @returns 성공하면 true, 실패하면 false.
  */
 export async function deleteMember(groupId, targetId) {
 	try {
