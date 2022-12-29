@@ -1,5 +1,5 @@
 import { sequelize } from "../setting.js";
-import { Group } from "../models/index.js";
+import { Group, GroupMember } from "../models/index.js";
 
 /**
  * @description 
@@ -48,25 +48,34 @@ import { Group } from "../models/index.js";
 		return (null);
 	}
 }
-	
+
 /**
  * @description 그룹(groupId)에 속하는 모든 멤버를 배열 형태로 반환하는 함수.
  * @param {number} groupId 그룹의 groupId.
  * @returns {Array<string>} 해당 그룹의 멤버들의 리스트. 실패하면 null 반환.
  */
+// Group.hasMany(GroupMember, {
+// 	as: "groupMembers",
+// 	foreignKey: "groupId",
+// });
+
+// GroupMember.belongsTo(Group, {
+// 	as: "groups",
+// 	foreignKey: "groupId",
+// });
 export async function getMemberList(groupId) {
 	try {
-		const users = await GroupMember.findAll({
+		const users = await Group.findAll({
 			where: { groupId },
-			attributes: ["targetId"],
+			attributes : [],
 			include : {
-				model : Group,
-				as: "groups",
-				attribute : [],
+				model : GroupMember,
+				attributes: ["targetId"],
+				as: "groupMembers",
 				required: true,
 			},
 		});
-		return (users.map( x => ({ targetId : x.dataValues.targetId})));
+		return (users[0].groupMembers.map(x => x.dataValues));
 	} catch (e) {
 		console.log(e);
 		return (null);
@@ -83,6 +92,15 @@ export async function getMemberList(groupId) {
  */
 export async function updateSelectedGroup(intraId, selectedGroupId) {
 	try {
+		const [existingGroup, ...other] = await Group.findAll({
+			where: { 
+				intraId, 
+				groupId : selectedGroupId
+			}
+		});
+		console.log(existingGroup);
+		if (existingGroup == null && selectedGroupId != null)
+			throw ("intraId and selectedGroupId doesn't match!");
 		await Group.update({
 				selected: 0
 			}, {
@@ -106,6 +124,7 @@ export async function updateSelectedGroup(intraId, selectedGroupId) {
  * @returns 성공하면 true, 실패하면 false 반환.
  */
 export async function insertGroup(intraId, groupName) {
+	// console.error(`why?`, intraId);
 	groupName = Array.isArray(groupName) ? groupName : [groupName];
 	const values = groupName.map(x => ({intraId, name: x}));
 	try {
