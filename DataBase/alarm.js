@@ -122,21 +122,28 @@ export async function getAllReservedAlarm() {
 	try {
 		Alarm.belongsTo(User, { foreignKey: 'intraId' });
 		Alarm.belongsTo(LocationStatus, { foreignKey: 'targetId' });
-		const alarms = await Alarm.findAll({
-		  include: [{
-			model: User,
-			attributes: ['slackId'],
-			required: true,
+		const alarms_ = await Alarm.findAll({
+			where: {
+				'$LocationStatus.host$': { [sequelize.Sequelize.Op.ne]: null }
+			},
+			attributes : ['alarmId', 'intraId', 'targetId'],
+		  	include: [{
+				model: User,
+				attributes: ['slackId'],
+				required: true,
 		  }, {
-			model: LocationStatus,
-			attributes: ['host'],
-			required: false,
-		  }],
-		  where: {
-			'$LocationStatus.host$': { [Sequelize.Op.ne]: null }
-		  }
+				model: LocationStatus,
+				attributes: ['host'],
+				required: false,
+		  }]
 		});
-		return alarms;
+		const alarm = alarms_.map(x => ({
+			alarmId : x.dataValues.alarmId,
+			intraId : x.dataValues.intraId,
+			targetId : x.dataValues.targetId,
+			host : x.dataValues.LocationStatus.host,
+			slackId : x.dataValues.User.slackId}));
+		return alarm;
 	} catch (e) {
 		console.error(e);
 		return (false);
