@@ -18,3 +18,9 @@ export async function insertGroup(intraId, name) {
       return false;
     }
   }
+
+export async function updateGroupName(groupId, newGroupName) {
+  const groupname = await Group.findByPk(groupId)
+  await groupname.update ({newGroupName: Group.name});
+  return (true);
+}
