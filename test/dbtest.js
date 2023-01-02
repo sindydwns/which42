@@ -320,11 +320,11 @@ async function test3() {
 	// alarmFuncs.getAlarmList();
 	assert.deepEqual(
 		(await alarmFuncs.getAlarmList(yonshin.intraId)).sort(sortByTargetId),
-		[{target: "ekwak"}, {target: "yonshin"}].sort(sortByTargetId)
+		[{targetId: "ekwak"}, {targetId: "yonshin"}].sort(sortByTargetId)
 	);
 	assert.deepEqual(
 		(await alarmFuncs.getAlarmList(sanghwal.intraId)).sort(sortByTargetId),
-		[{target: "yonshin"}].sort(sortByTargetId)
+		[{targetId: "yonshin"}].sort(sortByTargetId)
 	);
 	assert.deepEqual(
 		(await alarmFuncs.getAlarmList(ekwak.intraId)).sort(sortByTargetId),
