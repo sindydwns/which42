@@ -2,7 +2,7 @@ import assert from "assert";
 import { sequelize } from "../setting.js"
 import * as userFuncs from "../DataBase/dbuser.js"; // ekwak
 import * as groupFuncs from "../DataBase/groupManage.js"; // hyeyukim
-import * as alarmFuncs from "../DataBase/utils.js"; // sanghwal
+import * as alarmFuncs from "../DataBase/alarm.js"; // sanghwal
 import { User, LocationStatus, Group, GroupMember, Alarm, StatisticsHost, ErrorLog } from "../models/index.js";
 
 const strcmp = (str1, str2) => str1 < str2 ? -1 : str1 > str2 ? 1 : 0;
@@ -301,16 +301,16 @@ async function test3() {
 	await LocationStatus.create({targetId: "sanghwal", host: "c2r2s2"});
 
 	// alarmFuncs.insertAlarm();
-	const alarm1 = await alarmFuncs.insertAlarm(yonshin.intraId, ekwak.intraId, yonshin.slackId);
+	assert.ok(await alarmFuncs.insertAlarm(yonshin.intraId, ekwak.intraId, yonshin.slackId));
 	assert.equal((await Alarm.findAll()).length, 1);
 	assert.equal((await Alarm.findAll({ where: {intraId: yonshin.intraId}})).length, 1);
 	assert.equal((await Alarm.findAll({ where: {targetId: ekwak.intraId}})).length, 1);
-	const alarm2 = await alarmFuncs.insertAlarm(yonshin.intraId, yonshin.intraId, yonshin.slackId);
+	assert.ok(await alarmFuncs.insertAlarm(yonshin.intraId, yonshin.intraId, yonshin.slackId));
 	assert.equal((await Alarm.findAll()).length, 2);
 	assert.equal((await Alarm.findAll({ where: {intraId: yonshin.intraId}})).length, 2);
 	assert.equal((await Alarm.findAll({ where: {targetId: ekwak.intraId}})).length, 1);
 	assert.equal((await Alarm.findAll({ where: {targetId: yonshin.intraId}})).length, 1);
-	const alarm3 = await alarmFuncs.insertAlarm(sanghwal.intraId, yonshin.intraId, yonshin.slackId);
+	assert.ok(await alarmFuncs.insertAlarm(sanghwal.intraId, yonshin.intraId, yonshin.slackId));
 	assert.equal((await Alarm.findAll()).length, 3);
 	assert.equal((await Alarm.findAll({ where: {intraId: yonshin.intraId}})).length, 2);
 	assert.equal((await Alarm.findAll({ where: {intraId: sanghwal.intraId}})).length, 1);
@@ -319,17 +319,17 @@ async function test3() {
 
 	// alarmFuncs.getAlarmList();
 	assert.deepEqual(
-		(await alarmFuncs.getAlarmList(yonshin)).sort(sortByTargetId),
+		(await alarmFuncs.getAlarmList(yonshin.intraId)).sort(sortByTargetId),
 		[{target: "ekwak"}, {target: "yonshin"}].sort(sortByTargetId)
-	);;
+	);
 	assert.deepEqual(
-		(await alarmFuncs.getAlarmList(sanghwal)).sort(sortByTargetId),
+		(await alarmFuncs.getAlarmList(sanghwal.intraId)).sort(sortByTargetId),
 		[{target: "yonshin"}].sort(sortByTargetId)
-	);;
+	);
 	assert.deepEqual(
-		(await alarmFuncs.getAlarmList(ekwak)).sort(sortByTargetId),
+		(await alarmFuncs.getAlarmList(ekwak.intraId)).sort(sortByTargetId),
 		[].sort(sortByTargetId)
-	);;
+	);
 
 	// alarmFuncs.getAllReservedAlarm();
 	// 이걸 어떻게 테스트하지..?
@@ -337,17 +337,18 @@ async function test3() {
 	// 	(await alarmFuncs.getAllReservedAlarm()).sort(sortByTargetId),
 	// 	[...].sort(sortByTargetId)
 	// );;
-	assert.equal((await alarmFuncs.getAllReservedAlarm()).length, 3);
+	assert.equal((await alarmFuncs.getAllReservedAlarm()).length, 2);
 
 	// alarmFuncs.deleteReservedAlarm();
-	await alarmFuncs.deleteReservedAlarm(alarm2.alarmId);
+	const alarm1 = (await Alarm.findAll()).find(x => x.intraId == "yonshin" && x.targetId == "yonshin");
+	await alarmFuncs.deleteReservedAlarm(alarm1.alarmId);
 	assert.equal((await Alarm.findAll()).length, 2);
 	assert.equal((await Alarm.findAll({ where: {intraId: yonshin.intraId}})).length, 1);
 	assert.equal((await Alarm.findAll({ where: {intraId: sanghwal.intraId}})).length, 1);
 	assert.equal((await Alarm.findAll({ where: {targetId: ekwak.intraId}})).length, 1);
 	assert.equal((await Alarm.findAll({ where: {targetId: yonshin.intraId}})).length, 1);
 
-	const alarm4 = await alarmFuncs.insertAlarm(yonshin.intraId, yonshin.intraId, yonshin.slackId);
+	await alarmFuncs.insertAlarm(yonshin.intraId, yonshin.intraId, yonshin.slackId);
 	// alarmFuncs.deleteAlarm();
 	await alarmFuncs.deleteAlarm(yonshin.intraId, yonshin.intraId);
 	assert.equal((await Alarm.findAll()).length, 2);
@@ -364,7 +365,7 @@ async function test3() {
 	assert((await ErrorLog.findAll())[0].message, "yonshin error");
 
 }
-await test2();
+await test3();
 
 
 
