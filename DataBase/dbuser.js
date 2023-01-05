@@ -130,27 +130,32 @@ export async function deleteLocationTable(targets) {
  *   - targetId {string}: The intraId of a group member.
  *   - host {string}: The host of the group member's location, or null if the location is unknown.
  */
-export async function getGroupLocationInfo(intraId, groupId) {
-	const group = await Group.findOne({ where: { groupId } });
-	if (!group || group.intraId !== intraId) {
-	  return [];
-	}
-	const groupMembers = await GroupMember.findAll({ where: { groupId } });
-	const targetIds = groupMembers.map(member => member.targetId);
-	if (targetIds.length === 0) {
-	  return [];
-	}
-	const locations = await LocationStatus.findAll({ where: { targetId: targetIds } });
-	const locationMap = new Map();
-	for (const location of locations) {
-	  locationMap.set(location.targetId, location);
-	}
-	return targetIds.map(targetId => {
-	  const location = locationMap.get(targetId);
-	  return { targetId, host: location ? location.host : null };
+export async function getGroupLocationInfo(seekerId, groupId) {
+	const a = await groupList.findAll({
+		where: {
+			targetId, host
+		},
+		include: [{
+			model: groupMember,
+			attributes: ['groupId'],
+			require: true,
+		}, {
+			model: LocationStatus,
+			attributes: ['target_id'],
+			require: false,
+			where: seekerId, groupId,
+		}]
 	});
-  }
 
+	const locationInfo = a.map(x => ({
+		targetId : x.targetId,
+		host : x.host,
+		seekerId : x.seekerId,
+		groupId : x.groupId,
+	}));
+
+	return locationInfo;
+}
 /**
  * Get the user information for the given intraId
  * @param {string} intraId - The intraId of the user to get information for
